@@ -2,22 +2,20 @@
 
 WinLock est une application Windows conçue pour verrouiller l'écran et empêcher l'accès non autorisé en bloquant certaines combinaisons de touches, comme Ctrl+Alt+Suppr, Alt+Tab, et les touches Windows. L'application demande un mot de passe pour déverrouiller l'écran.
 
-```diff
-- Coming soon
-```
-- [ ] Finish WinLock
+- [X] Finish WinLock
 - [X] Push my commits to GitHub
-
 
 ## Fonctionnalités
 
-- Verrouillage de l'écran en mode plein écran avec une transparence de 80%.
-- Blocage des combinaisons de touches critiques pour empêcher l'accès non autorisé.
-- Demande d'un mot de passe pour déverrouiller l'écran.
+- **Verrouillage de l'écran en mode plein écran** avec une transparence de 90% pour un look moderne et discret.
+- **Blocage des combinaisons de touches critiques** pour empêcher l'accès non autorisé à l'ordinateur.
+- **Demande d'un mot de passe** pour déverrouiller l'écran. Le mot de passe par défaut est "0000".
+- **Notification par email** lorsqu'un mot de passe incorrect est saisi, alertant l'administrateur.
 
 ## Pré-requis
 
-- .NET Framework
+- .NET Framework 4.7.2
+- Une connexion Internet pour l'envoi d'emails via SMTP
 
 ## Installation
 
