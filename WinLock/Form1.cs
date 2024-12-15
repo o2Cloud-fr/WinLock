@@ -11,12 +11,11 @@ namespace WinLock
 {
     public partial class Form1 : Form
     {
-        private const int WH_KEYBOARD_LL = 13; // Ajout de la constante
-        private const int WM_KEYDOWN = 0x0100; // Correction de la constante
-        private const int WM_SYSKEYDOWN = 0x0104; // Correction de la constante
-        private const string correctPassword = "0000"; // Change to your desired password
+        private const int WH_KEYBOARD_LL = 13;
+        private const int WM_KEYDOWN = 0x0100;
+        private const int WM_SYSKEYDOWN = 0x0104;
+        private const string correctPassword = "0000";
 
-        // Import necessary functions from user32.dll
         [DllImport("user32.dll")]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
@@ -35,16 +34,17 @@ namespace WinLock
 
         private TextBox textBoxPassword;
         private Button buttonSubmit;
-        private Label labelInstruction; // Added label for instruction
+        private Label labelInstruction;
+        private Label labelStatus; // Added label for status message
 
         public Form1()
         {
-            InitializeComponent();
             InitializeComponents();
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
             this.TopMost = true;
-            this.Opacity = 0.8; // Set the transparency to 80%
+            this.Opacity = 0.9; // Increase transparency for modern feel
+            this.BackColor = System.Drawing.Color.FromArgb(34, 34, 34); // Dark background color
 
             _proc = HookCallback;
             _hookID = SetHook(_proc);
@@ -52,31 +52,50 @@ namespace WinLock
 
         private void InitializeComponents()
         {
-            labelInstruction = new Label(); // Initialize label for instruction
-            labelInstruction.Text = "Enter password to unlock:"; // Set instruction text
-            labelInstruction.Location = new System.Drawing.Point(300, 170); // Adjust position as needed
+            labelInstruction = new Label();
+            labelInstruction.Text = "Enter password to unlock:";
+            labelInstruction.Location = new System.Drawing.Point(300, 170);
+            labelInstruction.Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Regular); // Modern font
+            labelInstruction.ForeColor = System.Drawing.Color.White; // White text color
             labelInstruction.AutoSize = true;
 
             textBoxPassword = new TextBox();
             buttonSubmit = new Button();
+            labelStatus = new Label(); // Initialize the status label
 
-            textBoxPassword.Location = new System.Drawing.Point(300, 200); // Adjust position as needed
+            textBoxPassword.Location = new System.Drawing.Point(300, 200);
             textBoxPassword.Name = "textBoxPassword";
             textBoxPassword.PasswordChar = '*';
-            textBoxPassword.Size = new System.Drawing.Size(200, 20);
+            textBoxPassword.Size = new System.Drawing.Size(250, 30); // Adjusted size
+            textBoxPassword.Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Regular); // Modern font
             textBoxPassword.TabIndex = 0;
+            textBoxPassword.ForeColor = System.Drawing.Color.White;
+            textBoxPassword.BackColor = System.Drawing.Color.FromArgb(50, 50, 50); // Dark background for the textbox
 
-            buttonSubmit.Location = new System.Drawing.Point(510, 200); // Adjust position as needed
+            buttonSubmit.Location = new System.Drawing.Point(570, 200);
             buttonSubmit.Name = "buttonSubmit";
-            buttonSubmit.Size = new System.Drawing.Size(75, 23);
+            buttonSubmit.Size = new System.Drawing.Size(100, 35); // Adjusted button size
             buttonSubmit.TabIndex = 1;
             buttonSubmit.Text = "Submit";
+            buttonSubmit.Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Regular); // Modern font
+            buttonSubmit.ForeColor = System.Drawing.Color.White;
+            buttonSubmit.BackColor = System.Drawing.Color.FromArgb(75, 75, 75); // Dark background for button
+            buttonSubmit.FlatStyle = FlatStyle.Flat;
+            buttonSubmit.FlatAppearance.BorderSize = 0; // Remove button border for sleek look
             buttonSubmit.UseVisualStyleBackColor = true;
             buttonSubmit.Click += new System.EventHandler(this.buttonSubmit_Click);
 
-            this.Controls.Add(labelInstruction); // Add label to form
+            // Set up status label
+            labelStatus.Location = new System.Drawing.Point(300, 240); // Positioned below the password box
+            labelStatus.Font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Italic); // Modern font, italic style
+            labelStatus.ForeColor = System.Drawing.Color.White; // White text for status message
+            labelStatus.AutoSize = true;
+            labelStatus.Visible = false; // Initially hidden
+
+            this.Controls.Add(labelInstruction);
             this.Controls.Add(textBoxPassword);
             this.Controls.Add(buttonSubmit);
+            this.Controls.Add(labelStatus); // Add the status label to the form
         }
 
         private IntPtr SetHook(LowLevelKeyboardProc proc)
@@ -94,16 +113,13 @@ namespace WinLock
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                // Check if the key is a numeric key or a numpad key
-                if ((vkCode >= (int)Keys.D0 && vkCode <= (int)Keys.D9) || // Numeric keys
-                    (vkCode >= (int)Keys.NumPad0 && vkCode <= (int)Keys.NumPad9)) // Numpad keys
+                if ((vkCode >= (int)Keys.D0 && vkCode <= (int)Keys.D9) ||
+                    (vkCode >= (int)Keys.NumPad0 && vkCode <= (int)Keys.NumPad9))
                 {
-                    // Allow numeric and numpad keys
                     return CallNextHookEx(_hookID, nCode, wParam, lParam);
                 }
                 else
                 {
-                    // Block all other keys
                     return (IntPtr)1;
                 }
             }
@@ -119,31 +135,6 @@ namespace WinLock
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        private void InitializeComponent()
-        {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.SuspendLayout();
-            // 
-            // Form1
-            // 
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "Form1";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.ResumeLayout(false);
-
-        }
-
-        #endregion
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            // Optionally, initialize additional components here
-        }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             UnhookWindowsHookEx(_hookID);
@@ -151,45 +142,62 @@ namespace WinLock
 
         private async void buttonSubmit_Click(object sender, EventArgs e)
         {
+            // Désactive le bouton pour éviter plusieurs clics pendant l'envoi de l'email
+            buttonSubmit.Enabled = false;
+
+            // Affiche le message "Please wait while the notification is being sent to the administrator"
+            labelStatus.Text = "Please wait while the notification is being sent to the administrator...";
+            labelStatus.Visible = true;
+
             if (textBoxPassword.Text == correctPassword)
             {
                 UnhookWindowsHookEx(_hookID);
-                this.Close(); // Close the form if the password is correct
+                this.Close();
             }
             else
             {
-                MessageBox.Show("Incorrect Password. Try again.");
+                MessageBox.Show("Incorrect Password. Try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 try
                 {
-                    // Configure FluentEmail pour utiliser SMTP avec authentification
                     Email.DefaultSender = new SmtpSender(new SmtpClient("smtp.server.com")
                     {
                         UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("email@erver.com", "P@ssw0rd"),
-                        EnableSsl = true // Activer SSL si nécessaire
+                        Credentials = new NetworkCredential("email@server.com", "P@ssw0rd"),
+                        EnableSsl = true
                     });
 
-                    // Créez le message e-mail
                     var email = Email
-                        .From("email@erver.com")
-                        .To("email@erver.com")
-                        .Subject("Subject")
-                        .Body($"Le mot de passe incorrect a été saisi lors de la tentative de déverrouillage du système.");
+                        .From("email@server.com")
+                        .To("email@server.com")
+                        .Subject("WinLock - o2Cloud")
+                        .Body($"The incorrect password was entered during the unlock attempt.");
 
-                    // Envoyez l'e-mail
-                    await email.SendAsync();
+                    var sendResult = await email.SendAsync();
 
-                   //MessageBox.Show("L'e-mail a été envoyé avec succès !", "Confirmation", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (sendResult.Successful)
+                    {
+                        MessageBox.Show("Email sent successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to send email. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show($"Une erreur s'est produite lors de l'envoi de l'e-mail : {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error sending email: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 textBoxPassword.Clear();
                 textBoxPassword.Focus();
             }
+
+            // Réactive le bouton après l'envoi de l'email
+            buttonSubmit.Enabled = true;
+
+            // Cache le message une fois l'envoi terminé
+            labelStatus.Visible = false;
         }
     }
 }
